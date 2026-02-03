@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Compra - JTR Digital Solutions</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html"><i class="fas fa-store"></i> JTR Digital Solutions</a>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <!-- Menu carregado via JavaScript -->
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1><i class="fas fa-shopping-bag"></i> Finalizar Compra</h1>
+        
+        <div id="checkout-message" class="alert" style="display: none;"></div>
+        
+        <div id="checkout-content">
+            <!-- Conteúdo carregado via JavaScript -->
+        </div>
+        
+        <!-- Modal de confirmação -->
+        <div id="confirmation-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2><i class="fas fa-check-circle"></i> Compra Confirmada!</h2>
+                <div id="order-details"></div>
+                <div class="modal-actions">
+                    <button onclick="continueShopping()" class="btn">
+                        <i class="fas fa-shopping-bag"></i> Continuar a Comprar
+                    </button>
+                    <a href="encomendas.html" class="btn btn-outline">
+                        <i class="fas fa-history"></i> Ver Minhas Encomendas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>JTR Digital Solutions</h3>
+                <p>Loja online com os melhores produtos</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contactos</h3>
+                <p><i class="fas fa-envelope"></i> info@eshop.pt</p>
+                <p><i class="fas fa-phone"></i> +351 123 456 789</p>
+            </div>
+            <div class="footer-section">
+                <h3>Links Rápidos</h3>
+                <p><a href="produtos.html">Produtos</a></p>
+                <p><a href="empregos.html">Empregos</a></p>
+                <p><a href="login.html">Área de Cliente</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 JTR Digital Solutions. Todos os direitos reservados.</p>
+            <p>Este site utiliza cookies para melhorar a experiência.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Atualizar menu
+            app.updateMenu();
+            
+            // Carregar checkout
+            loadCheckout();
+        });
+        
+        function loadCheckout() {
+            const cart = app.getCart();
+            const user = app.getCurrentUser();
+            
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (cart.length === 0) {
+                document.getElementById('checkout-content').innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart fa-4x"></i>
+                        <h2>O seu carrinho está vazio</h2>
+                        <p>Adicione produtos para começar a comprar!</p>
+                        <a href="produtos.html" class="btn">
+                            <i class="fas fa-shopping-bag"></i> Ver Produtos
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            const subtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
+            const shipping = 5.00;
+            const total = subtotal + shipping;
+            
+            document.getElementById('checkout-content').innerHTML = `
+                <div class="checkout-container">
+                    <div class="checkout-steps">
+                        <div class="step active"><i class="fas fa-user"></i> 1. Dados Pessoais</div>
+                        <div class="step"><i class="fas fa-truck"></i> 2. Envio</div>
+                        <div class="step"><i class="fas fa-credit-card"></i> 3. Pagamento</div>
+                    </div>
+                    
+                    <form id="checkout-form">
+                        <div class="checkout-grid">
+                            <!-- Dados pessoais -->
+                            <div class="checkout-section">
+                                <h2><i class="fas fa-user"></i> Dados Pessoais</h2>
+                                <div class="form-group">
+                                    <label>Nome Completo:</label>
+                                    <input type="text" id="full-name" value="${user.username}" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Email:</label>
+                                    <input type="email" id="email" value="${user.email}" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Telefone:</label>
+                                    <input type="tel" id="phone" placeholder="912 345 678" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>NIF (opcional):</label>
+                                    <input type="text" id="nif" placeholder="123 456 789">
+                                </div>
+                            </div>
+                            
+                            <!-- Endereço de envio -->
+                            <div class="checkout-section">
+                                <h2><i class="fas fa-truck"></i> Endereço de Envio</h2>
+                                
+                                <div class="form-group">
+                                    <label>Morada:</label>
+                                    <input type="text" id="address" placeholder="Rua, número" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Complemento:</label>
+                                    <input type="text" id="address2" placeholder="Andar, porta">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Código Postal:</label>
+                                    <input type="text" id="postal-code" placeholder="0000-000" required>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Cidade:</label>
+                                        <input type="text" id="city" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Distrito:</label>
+                                        <select id="district" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="lisboa">Lisboa</option>
+                                            <option value="porto">Porto</option>
+                                            <option value="aveiro">Aveiro</option>
+                                            <option value="braga">Braga</option>
+                                            <option value="coimbra">Coimbra</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>País:</label>
+                                    <input type="text" id="country" value="Portugal" readonly>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Método de Envio:</label>
+                                    <div class="shipping-methods">
+                                        <label class="shipping-option">
+                                            <input type="radio" name="shipping" value="standard" checked>
+                                            <div class="option-content">
+                                                <span class="option-title">Entrega Standard</span>
+                                                <span class="option-desc">3-5 dias úteis</span>
+                                                <span class="option-price">€5.00</span>
+                                            </div>
+                                        </label>
+                                        
+                                        <label class="shipping-option">
+                                            <input type="radio" name="shipping" value="express">
+                                            <div class="option-content">
+                                                <span class="option-title">Entrega Expressa</span>
+                                                <span class="option-desc">1-2 dias úteis</span>
+                                                <span class="option-price">€10.00</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Método de pagamento -->
+                            <div class="checkout-section">
+                                <h2><i class="fas fa-credit-card"></i> Método de Pagamento</h2>
+                                
+                                <div class="payment-methods">
+                                    <label class="payment-option">
+                                        <input type="radio" name="payment" value="mbway" checked>
+                                        <div class="option-content">
+                                            <i class="fas fa-mobile-alt"></i>
+                                            <span>MB Way</span>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="payment-option">
+                                        <input type="radio" name="payment" value="multibanco">
+                                        <div class="option-content">
+                                            <i class="fas fa-print"></i>
+                                            <span>Multibanco</span>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="payment-option">
+                                        <input type="radio" name="payment" value="cartao">
+                                        <div class="option-content">
+                                            <i class="fas fa-credit-card"></i>
+                                            <span>Cartão de Crédito</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <!-- Detalhes do cartão (mostrar apenas se selecionado) -->
+                                <div id="card-details" class="card-details" style="display: none;">
+                                    <div class="form-group">
+                                        <label>Número do Cartão:</label>
+                                        <input type="text" id="card-number" placeholder="1234 5678 9012 3456">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Validade:</label>
+                                            <input type="text" id="card-expiry" placeholder="MM/AA">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>CVV:</label>
+                                            <input type="text" id="card-cvv" placeholder="123">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Titular do Cartão:</label>
+                                        <input type="text" id="card-name" placeholder="Nome como aparece no cartão">
+                                    </div>
+                                </div>
+                                
+                                <!-- Detalhes MB Way (mostrar apenas se selecionado) -->
+                                <div id="mbway-details" class="mbway-details">
+                                    <div class="form-group">
+                                        <label>Telemóvel MB Way:</label>
+                                        <input type="tel" id="mbway-phone" placeholder="912 345 678" required>
+                                    </div>
+                                    <p class="info-text">Receberá uma notificação no telemóvel para confirmar o pagamento.</p>
+                                </div>
+                                
+                                <!-- Termos e condições -->
+                                <div class="form-group terms-check">
+                                    <label>
+                                        <input type="checkbox" id="terms" required>
+                                        Aceito os <a href="#" onclick="showTerms()">Termos e Condições</a> e a <a href="#" onclick="showPrivacy()">Política de Privacidade</a>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-group newsletter-check">
+                                    <label>
+                                        <input type="checkbox" id="newsletter" checked>
+                                        Quero receber novidades e ofertas especiais por email
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Resumo da encomenda -->
+                            <div class="checkout-summary">
+                                <h2><i class="fas fa-receipt"></i> Resumo da Encomenda</h2>
+                                
+                                <div class="order-items">
+                                    ${cart.map(item => `
+                                    <div class="order-item">
+                                        <div class="item-info">
+                                            <span class="item-name">${item.product.nome} x${item.quantity}</span>
+                                            <span class="item-price">€${item.subtotal.toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                    `).join('')}
+                                </div>
+                                
+                                <div class="order-totals">
+                                    <div class="total-row">
+                                        <span>Subtotal:</span>
+                                        <span>€${subtotal.toFixed(2)}</span>
+                                    </div>
+                                    
+                                    <div class="total-row">
+                                        <span>Portes:</span>
+                                        <span id="shipping-cost">€${shipping.toFixed(2)}</span>
+                                    </div>
+                                    
+                                    <div class="total-row">
+                                        <span>IVA (23%):</span>
+                                        <span>€${(subtotal * 0.23).toFixed(2)}</span>
+                                    </div>
+                                    
+                                    <div class="total-row grand-total">
+                                        <span>Total:</span>
+                                        <span id="total-cost">€${total.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-success btn-large btn-full">
+                                    <i class="fas fa-lock"></i> Finalizar Compra
+                                </button>
+                                
+                                <p class="security-notice">
+                                    <i class="fas fa-shield-alt"></i> Pagamento 100% seguro e encriptado
+                                </p>
+                                
+                                <div class="support-info">
+                                    <p><i class="fas fa-question-circle"></i> Precisa de ajuda? <a href="contact.html">Contacte-nos</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            // Configurar eventos
+            document.getElementById('checkout-form').addEventListener('submit', processCheckout);
+            
+            // Mostrar/ocultar detalhes do método de pagamento
+            document.querySelectorAll('input[name="payment"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updatePaymentDetails();
+                });
+            });
+            
+            // Atualizar custos de envio
+            document.querySelectorAll('input[name="shipping"]').forEach(radio => {
+                radio.addEventListener('change', updateShippingCost);
+            });
+        }
+        
+        function updatePaymentDetails() {
+            const method = document.querySelector('input[name="payment"]:checked').value;
+            const cardDetails = document.getElementById('card-details');
+            const mbwayDetails = document.getElementById('mbway-details');
+            
+            if (method === 'cartao') {
+                cardDetails.style.display = 'block';
+                mbwayDetails.style.display = 'none';
+            } else if (method === 'mbway') {
+                cardDetails.style.display = 'none';
+                mbwayDetails.style.display = 'block';
+            } else {
+                cardDetails.style.display = 'none';
+                mbwayDetails.style.display = 'none';
+            }
+        }
+        
+        function updateShippingCost() {
+            const method = document.querySelector('input[name="shipping"]:checked').value;
+            const shippingCost = method === 'express' ? 10.00 : 5.00;
+            const cart = app.getCart();
+            const subtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
+            const total = subtotal + shippingCost;
+            
+            document.getElementById('shipping-cost').textContent = `€${shippingCost.toFixed(2)}`;
+            document.getElementById('total-cost').textContent = `€${total.toFixed(2)}`;
+        }
+        
+        function processCheckout(e) {
+            e.preventDefault();
+            
+            const cart = app.getCart();
+            if (cart.length === 0) {
+                showMessage('O carrinho está vazio!', 'error');
+                return;
+            }
+            
+            // Validar dados do formulário
+            const requiredFields = ['full-name', 'email', 'phone', 'address', 'postal-code', 'city'];
+            for (const fieldId of requiredFields) {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    showMessage(`Por favor, preencha o campo "${field.previousElementSibling.textContent}"`, 'error');
+                    field.focus();
+                    return;
+                }
+            }
+            
+            if (!document.getElementById('terms').checked) {
+                showMessage('Por favor, aceite os termos e condições.', 'error');
+                return;
+            }
+            
+            // Processar encomenda
+            const result = app.checkout();
+            
+            if (result.success) {
+                showOrderConfirmation(result.order);
+            } else {
+                showMessage('Erro ao processar a encomenda: ' + result.error, 'error');
+            }
+        }
+        
+        function showOrderConfirmation(order) {
+            document.getElementById('checkout-content').style.display = 'none';
+            
+            document.getElementById('order-details').innerHTML = `
+                <div class="order-confirmation">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    
+                    <h3>Obrigado pela sua compra!</h3>
+                    
+                    <div class="order-info">
+                        <p><strong>Número da Encomenda:</strong> #${order.id}</p>
+                        <p><strong>Data:</strong> ${new Date(order.date).toLocaleDateString('pt-PT')}</p>
+                        <p><strong>Total:</strong> €${order.total.toFixed(2)}</p>
+                        <p><strong>Estado:</strong> <span class="status processando">Processando</span></p>
+                    </div>
+                    
+                    <div class="confirmation-message">
+                        <p>Receberá um email de confirmação com os detalhes da sua encomenda.</p>
+                        <p>Pode acompanhar o estado da sua encomenda na sua <a href="perfil.html">área de cliente</a>.</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('confirmation-modal').style.display = 'block';
+        }
+        
+        function continueShopping() {
+            window.location.href = 'produtos.html';
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('checkout-message');
+            messageDiv.textContent = text;
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showTerms() {
+            alert('Termos e Condições:\n\n1. Aceitação dos termos\n2. Informações do produto\n3. Preços e pagamento\n4. Entrega\n5. Direito de arrependimento\n6. Garantia\n7. Responsabilidade\n8. Propriedade intelectual\n9. Privacidade\n10. Lei aplicável');
+        }
+        
+        function showPrivacy() {
+            alert('Política de Privacidade:\n\nOs seus dados são tratados de acordo com o RGPD. Utilizamos os seus dados apenas para processar encomendas e melhorar a sua experiência. Nunca partilhamos os seus dados com terceiros sem o seu consentimento.');
+        }
+    </script>
+    
+    <style>
+        .checkout-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .checkout-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .checkout-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #eee;
+            z-index: 1;
+        }
+        
+        .step {
+            position: relative;
+            z-index: 2;
+            background: #eee;
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: #666;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .step.active {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .checkout-section {
+            grid-column: 1;
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .shipping-methods, .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .shipping-option, .payment-option {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .shipping-option:hover, .payment-option:hover {
+            border-color: #4CAF50;
+            background: #f0fff4;
+        }
+        
+        .shipping-option input:checked + .option-content,
+        .payment-option input:checked + .option-content {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .option-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .option-title {
+            font-weight: 500;
+        }
+        
+        .option-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .option-price {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .payment-option .option-content {
+            gap: 10px;
+        }
+        
+        .card-details, .mbway-details {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        
+        .info-text {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .terms-check, .newsletter-check {
+            margin: 20px 0;
+        }
+        
+        .security-notice {
+            text-align: center;
+            color: #666;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .support-info {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .confirmation-icon {
+            font-size: 4rem;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        
+        .order-info {
+            text-align: left;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .order-info p {
+            margin: 10px 0;
+        }
+        
+        .confirmation-message {
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        @media (max-width: 992px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkout-steps {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .step {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</body>
+</html>

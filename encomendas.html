@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Encomendas - JTR Digital Solutions</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html"><i class="fas fa-store"></i> JTR Digital Solutions</a>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <!-- Menu carregado via JavaScript -->
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1><i class="fas fa-history"></i> Minhas Encomendas</h1>
+        
+        <div class="orders-filters">
+            <div class="filter-group">
+                <label>Filtrar por estado:</label>
+                <select id="status-filter" onchange="filterOrders()">
+                    <option value="all">Todas</option>
+                    <option value="pendente">Pendentes</option>
+                    <option value="processando">Processando</option>
+                    <option value="enviada">Enviadas</option>
+                    <option value="entregue">Entregues</option>
+                    <option value="cancelada">Canceladas</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Ordenar por:</label>
+                <select id="sort-orders" onchange="sortOrders()">
+                    <option value="recentes">Mais Recentes</option>
+                    <option value="antigas">Mais Antigas</option>
+                    <option value="valor-crescente">Valor (Crescente)</option>
+                    <option value="valor-decrescente">Valor (Decrescente)</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Período:</label>
+                <select id="period-filter" onchange="filterByPeriod()">
+                    <option value="all">Todo o período</option>
+                    <option value="last-month">Último mês</option>
+                    <option value="last-3months">Últimos 3 meses</option>
+                    <option value="last-year">Último ano</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="orders-container">
+            <!-- Encomendas carregadas via JavaScript -->
+        </div>
+        
+        <div id="no-orders" class="no-data" style="display: none;">
+            <i class="fas fa-box-open fa-4x"></i>
+            <h3>Nenhuma encomenda encontrada</h3>
+            <p>Ainda não fez nenhuma encomenda na nossa loja.</p>
+            <a href="produtos.html" class="btn mt-20">
+                <i class="fas fa-shopping-bag"></i> Descobrir Produtos
+            </a>
+        </div>
+        
+        <!-- Estatísticas -->
+        <div class="orders-stats">
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <h3 id="pending-count">0</h3>
+                <p>Pendentes</p>
+            </div>
+            
+            <div class="stat-card">
+                <i class="fas fa-truck"></i>
+                <h3 id="shipped-count">0</h3>
+                <p>Enviadas</p>
+            </div>
+            
+            <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <h3 id="delivered-count">0</h3>
+                <p>Entregues</p>
+            </div>
+            
+            <div class="stat-card">
+                <i class="fas fa-euro-sign"></i>
+                <h3 id="total-spent">€0.00</h3>
+                <p>Total Gasto</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>JTR Digital Solutions</h3>
+                <p>Loja online com os melhores produtos</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contactos</h3>
+                <p><i class="fas fa-envelope"></i> info@eshop.pt</p>
+                <p><i class="fas fa-phone"></i> +351 123 456 789</p>
+            </div>
+            <div class="footer-section">
+                <h3>Links Rápidos</h3>
+                <p><a href="produtos.html">Produtos</a></p>
+                <p><a href="empregos.html">Empregos</a></p>
+                <p><a href="login.html">Área de Cliente</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 JTR Digital Solutions. Todos os direitos reservados.</p>
+            <p>Este site utiliza cookies para melhorar a experiência.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        let allOrders = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Atualizar menu
+            app.updateMenu();
+            
+            // Verificar se o utilizador está autenticado
+            if (!app.getCurrentUser()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Carregar encomendas
+            loadOrders();
+        });
+        
+        function loadOrders() {
+            // Em uma aplicação real, aqui buscaríamos as encomendas do servidor
+            // Para demonstração, usamos dados de exemplo
+            
+            const user = app.getCurrentUser();
+            
+            // Se tivermos encomendas reais no localStorage, usamos essas
+            const storedOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const userOrders = storedOrders.filter(order => order.userId === user.id);
+            
+            if (userOrders.length > 0) {
+                allOrders = userOrders;
+            } else {
+                // Dados de exemplo para demonstração
+                allOrders = [
+                    {
+                        id: 1001,
+                        userId: user.id,
+                        items: [
+                            { productId: 1, quantity: 1, price: 799.99 },
+                            { productId: 3, quantity: 2, price: 19.99 }
+                        ],
+                        total: 839.97,
+                        status: 'entregue',
+                        date: '2025-01-15T10:30:00Z',
+                        shippingAddress: 'Rua das Flores, 123, Lisboa',
+                        trackingNumber: 'TRK123456789PT'
+                    },
+                    {
+                        id: 1002,
+                        userId: user.id,
+                        items: [
+                            { productId: 2, quantity: 1, price: 29.99 },
+                            { productId: 4, quantity: 1, price: 149.99 }
+                        ],
+                        total: 179.98,
+                        status: 'enviada',
+                        date: '2025-01-20T14:15:00Z',
+                        shippingAddress: 'Avenida da Liberdade, 456, Porto',
+                        trackingNumber: 'TRK987654321PT'
+                    },
+                    {
+                        id: 1003,
+                        userId: user.id,
+                        items: [
+                            { productId: 5, quantity: 1, price: 299.99 }
+                        ],
+                        total: 304.99, // +5€ portes
+                        status: 'processando',
+                        date: '2025-01-25T09:45:00Z',
+                        shippingAddress: 'Praça do Comércio, 789, Lisboa'
+                    }
+                ];
+            }
+            
+            displayOrders(allOrders);
+            updateStats();
+        }
+        
+        function displayOrders(orders) {
+            const container = document.getElementById('orders-container');
+            const noOrders = document.getElementById('no-orders');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '';
+                noOrders.style.display = 'block';
+                return;
+            }
+            
+            noOrders.style.display = 'none';
+            
+            container.innerHTML = orders.map(order => `
+                <div class="order-card ${order.status}">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <h3>Encomenda #${order.id}</h3>
+                            <span class="order-date">${formatDate(order.date)}</span>
+                        </div>
+                        
+                        <div class="order-status">
+                            <span class="status ${order.status}">${getStatusText(order.status)}</span>
+                            <span class="order-total">€${order.total.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="order-details">
+                        <div class="order-items">
+                            <h4>Produtos:</h4>
+                            ${getOrderItemsHTML(order.items)}
+                        </div>
+                        
+                        <div class="order-shipping">
+                            <h4>Informações de Envio:</h4>
+                            <p><i class="fas fa-map-marker-alt"></i> ${order.shippingAddress || 'Não especificado'}</p>
+                            ${order.trackingNumber ? `
+                            <p><i class="fas fa-truck"></i> Número de Rastreio: ${order.trackingNumber}</p>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="order-actions">
+                        ${order.status === 'pendente' ? `
+                        <button onclick="cancelOrder(${order.id})" class="btn btn-small btn-danger">
+                            <i class="fas fa-times"></i> Cancelar Encomenda
+                        </button>
+                        ` : ''}
+                        
+                        ${order.status === 'enviada' ? `
+                        <button onclick="trackOrder(${order.id})" class="btn btn-small">
+                            <i class="fas fa-map-marked-alt"></i> Rastrear Encomenda
+                        </button>
+                        ` : ''}
+                        
+                        <button onclick="viewOrderDetails(${order.id})" class="btn btn-small btn-outline">
+                            <i class="fas fa-eye"></i> Ver Detalhes
+                        </button>
+                        
+                        ${order.status === 'entregue' ? `
+                        <button onclick="reorder(${order.id})" class="btn btn-small">
+                            <i class="fas fa-redo"></i> Comprar Novamente
+                        </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getOrderItemsHTML(items) {
+            const products = app.getProducts();
+            
+            return items.map(item => {
+                const product = products.find(p => p.id === item.productId);
+                return product ? `
+                    <div class="order-item">
+                        <img src="images/${product.imagem || 'default.jpg'}" 
+                             alt="${product.nome}"
+                             onerror="this.src='images/default.jpg'">
+                        <div class="item-info">
+                            <h5>${product.nome}</h5>
+                            <p>Quantidade: ${item.quantity} × €${item.price.toFixed(2)}</p>
+                            <p class="item-subtotal">Subtotal: €${(item.quantity * item.price).toFixed(2)}</p>
+                        </div>
+                    </div>
+                ` : '';
+            }).join('');
+        }
+        
+        function getStatusText(status) {
+            const statusMap = {
+                'pendente': 'Pendente',
+                'processando': 'Processando',
+                'enviada': 'Enviada',
+                'entregue': 'Entregue',
+                'cancelada': 'Cancelada'
+            };
+            return statusMap[status] || status;
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-PT', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function filterOrders() {
+            const status = document.getElementById('status-filter').value;
+            let filtered = allOrders;
+            
+            if (status !== 'all') {
+                filtered = allOrders.filter(order => order.status === status);
+            }
+            
+            displayOrders(filtered);
+        }
+        
+        function sortOrders() {
+            const sortBy = document.getElementById('sort-orders').value;
+            let sorted = [...allOrders];
+            
+            switch(sortBy) {
+                case 'recentes':
+                    sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    break;
+                case 'antigas':
+                    sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    break;
+                case 'valor-crescente':
+                    sorted.sort((a, b) => a.total - b.total);
+                    break;
+                case 'valor-decrescente':
+                    sorted.sort((a, b) => b.total - a.total);
+                    break;
+            }
+            
+            displayOrders(sorted);
+        }
+        
+        function filterByPeriod() {
+            const period = document.getElementById('period-filter').value;
+            let filtered = allOrders;
+            
+            const now = new Date();
+            let cutoffDate = new Date(0); // Data muito antiga
+            
+            switch(period) {
+                case 'last-month':
+                    cutoffDate = new Date(now.setMonth(now.getMonth() - 1));
+                    break;
+                case 'last-3months':
+                    cutoffDate = new Date(now.setMonth(now.getMonth() - 3));
+                    break;
+                case 'last-year':
+                    cutoffDate = new Date(now.setFullYear(now.getFullYear() - 1));
+                    break;
+            }
+            
+            if (period !== 'all') {
+                filtered = allOrders.filter(order => new Date(order.date) >= cutoffDate);
+            }
+            
+            displayOrders(filtered);
+        }
+        
+        function updateStats() {
+            const pending = allOrders.filter(o => o.status === 'pendente').length;
+            const shipped = allOrders.filter(o => o.status === 'enviada').length;
+            const delivered = allOrders.filter(o => o.status === 'entregue').length;
+            const totalSpent = allOrders.reduce((sum, order) => sum + order.total, 0);
+            
+            document.getElementById('pending-count').textContent = pending;
+            document.getElementById('shipped-count').textContent = shipped;
+            document.getElementById('delivered-count').textContent = delivered;
+            document.getElementById('total-spent').textContent = `€${totalSpent.toFixed(2)}`;
+        }
+        
+        function cancelOrder(orderId) {
+            if (confirm('Tem certeza que deseja cancelar esta encomenda?')) {
+                const order = allOrders.find(o => o.id === orderId);
+                if (order && order.status === 'pendente') {
+                    order.status = 'cancelada';
+                    displayOrders(allOrders);
+                    updateStats();
+                    alert('Encomenda cancelada com sucesso!');
+                }
+            }
+        }
+        
+        function trackOrder(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (order && order.trackingNumber) {
+                alert(`Rastreio da encomenda #${orderId}:\n\nNúmero: ${order.trackingNumber}\n\nPode rastrear no site dos CTT: https://www.ctt.pt`);
+            } else {
+                alert('Ainda não há informações de rastreio disponíveis para esta encomenda.');
+            }
+        }
+        
+        function viewOrderDetails(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const details = `
+                <h3>Detalhes da Encomenda #${order.id}</h3>
+                <p><strong>Data:</strong> ${formatDate(order.date)}</p>
+                <p><strong>Estado:</strong> ${getStatusText(order.status)}</p>
+                <p><strong>Total:</strong> €${order.total.toFixed(2)}</p>
+                <p><strong>Morada de Envio:</strong> ${order.shippingAddress}</p>
+                ${order.trackingNumber ? `<p><strong>Número de Rastreio:</strong> ${order.trackingNumber}</p>` : ''}
+                
+                <h4>Produtos:</h4>
+                ${getOrderDetailsHTML(order.items)}
+            `;
+            
+            alert(details);
+        }
+        
+        function getOrderDetailsHTML(items) {
+            const products = app.getProducts();
+            let html = '';
+            
+            items.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                if (product) {
+                    html += `\n• ${product.nome} x${item.quantity} - €${item.price.toFixed(2)} cada\n`;
+                }
+            });
+            
+            return html;
+        }
+        
+        function reorder(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            // Adicionar todos os itens da encomenda ao carrinho
+            order.items.forEach(item => {
+                app.addToCart(item.productId, item.quantity);
+            });
+            
+            alert('Produtos adicionados ao carrinho!');
+            window.location.href = 'carrinho.html';
+        }
+    </script>
+    
+    <style>
+        .orders-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-group label {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .filter-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        #orders-container {
+            margin: 30px 0;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            border-left: 5px solid #ddd;
+        }
+        
+        .order-card.pendente {
+            border-left-color: #ff9800;
+        }
+        
+        .order-card.processando {
+            border-left-color: #2196F3;
+        }
+        
+        .order-card.enviada {
+            border-left-color: #9c27b0;
+        }
+        
+        .order-card.entregue {
+            border-left-color: #4CAF50;
+        }
+        
+        .order-card.cancelada {
+            border-left-color: #f44336;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+        
+        .order-info h3 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        
+        .order-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .order-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .order-status .status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .order-total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .order-details {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .order-items h4, .order-shipping h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .order-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        
+        .item-info h5 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+        }
+        
+        .item-subtotal {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .order-shipping p {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+        
+        .order-actions {
+            padding: 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .orders-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            margin: 10px 0;
+            color: #333;
+        }
+        
+        .stat-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .order-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .order-status {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</body>
+</html>

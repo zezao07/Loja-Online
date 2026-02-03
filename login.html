@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - JTR Digital Solutions</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html"><i class="fas fa-store"></i>JTR Digital Solutions</a>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <!-- Menu será carregado via JavaScript -->
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="form-container">
+            <h1><i class="fas fa-sign-in-alt"></i> Login</h1>
+            
+            <div id="message" class="alert" style="display: none;"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email:</label>
+                    <input type="email" id="email" required 
+                           placeholder="exemplo@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password:</label>
+                    <input type="password" id="password" required 
+                           placeholder="Introduza a sua password">
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="remember"> Lembrar-me
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-full">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
+            </form>
+            
+            <div class="form-footer">
+                <p>Ainda não tem conta? <a href="registar.html">Registe-se aqui</a></p>
+                <p><a href="#" onclick="resetPassword()">Esqueceu-se da password?</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>JTR Digital Solutions</h3>
+                <p>Loja online com os melhores produtos</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contactos</h3>
+                <p><i class="fas fa-envelope"></i> info@eshop.pt</p>
+                <p><i class="fas fa-phone"></i> +351 123 456 789</p>
+            </div>
+            <div class="footer-section">
+                <h3>Links Rápidos</h3>
+                <p><a href="produtos.html">Produtos</a></p>
+                <p><a href="empregos.html">Empregos</a></p>
+                <p><a href="login.html">Área de Cliente</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 JTR Digital Solutions. Todos os direitos reservados.</p>
+            <p>Este site utiliza cookies para melhorar a experiência.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Atualizar menu
+            app.updateMenu();
+            
+            // Preencher dados guardados
+            const savedEmail = localStorage.getItem('savedEmail');
+            const savedPassword = localStorage.getItem('savedPassword');
+            
+            if (savedEmail) document.getElementById('email').value = savedEmail;
+            if (savedPassword) document.getElementById('password').value = savedPassword;
+            
+            // Submeter formulário
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const remember = document.getElementById('remember').checked;
+                
+                const result = app.login(email, password);
+                
+                if (result.success) {
+                    showMessage('Login efetuado com sucesso!', 'success');
+                    
+                    // Guardar dados se selecionado
+                    if (remember) {
+                        localStorage.setItem('savedEmail', email);
+                        localStorage.setItem('savedPassword', password);
+                    } else {
+                        localStorage.removeItem('savedEmail');
+                        localStorage.removeItem('savedPassword');
+                    }
+                    
+                    // Redirecionar após 1 segundo
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showMessage(result.error, 'error');
+                }
+            });
+        });
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function resetPassword() {
+            const email = prompt('Introduza o seu email para recuperar a password:');
+            if (email) {
+                alert('Instruções de recuperação enviadas para ' + email);
+            }
+        }
+    </script>
+</body>
+</html>

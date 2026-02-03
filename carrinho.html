@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho de Compras - JTR Digital Solutions</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html"><i class="fas fa-store"></i> JTR Digital Solutions</a>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <!-- Menu carregado via JavaScript -->
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1><i class="fas fa-shopping-cart"></i> Meu Carrinho</h1>
+        
+        <div id="cart-message" class="alert" style="display: none;"></div>
+        
+        <div id="cart-content">
+            <!-- Conteúdo do carrinho carregado via JavaScript -->
+        </div>
+        
+        <!-- Sugestões de produtos -->
+        <section class="suggestions">
+            <h2><i class="fas fa-lightbulb"></i> Pode também gostar</h2>
+            <div class="products-grid" id="suggestions-grid">
+                <!-- Sugestões carregadas via JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>JTR Digital Solutions</h3>
+                <p>Loja online com os melhores produtos</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contactos</h3>
+                <p><i class="fas fa-envelope"></i> info@eshop.pt</p>
+                <p><i class="fas fa-phone"></i> +351 123 456 789</p>
+            </div>
+            <div class="footer-section">
+                <h3>Links Rápidos</h3>
+                <p><a href="produtos.html">Produtos</a></p>
+                <p><a href="empregos.html">Empregos</a></p>
+                <p><a href="login.html">Área de Cliente</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 JTR Digital Solutions. Todos os direitos reservados.</p>
+            <p>Este site utiliza cookies para melhorar a experiência.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Atualizar menu
+            app.updateMenu();
+            
+            // Carregar carrinho
+            loadCart();
+            
+            // Carregar sugestões
+            loadSuggestions();
+        });
+        
+        function loadCart() {
+            const cart = app.getCart();
+            const user = app.getCurrentUser();
+            
+            if (!user) {
+                document.getElementById('cart-content').innerHTML = `
+                    <div class="login-prompt">
+                        <i class="fas fa-shopping-cart fa-4x"></i>
+                        <h2>Faça login para ver o seu carrinho</h2>
+                        <p>Guarde os seus produtos favoritos e finalize compras mais rapidamente.</p>
+                        <div class="auth-buttons">
+                            <a href="login.html" class="btn">
+                                <i class="fas fa-sign-in-alt"></i> Fazer Login
+                            </a>
+                            <a href="registar.html" class="btn btn-outline">
+                                <i class="fas fa-user-plus"></i> Criar Conta
+                            </a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (cart.length === 0) {
+                document.getElementById('cart-content').innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart fa-4x"></i>
+                        <h2>O seu carrinho está vazio</h2>
+                        <p>Adicione produtos para começar a comprar!</p>
+                        <div class="cart-actions">
+                            <a href="produtos.html" class="btn">
+                                <i class="fas fa-shopping-bag"></i> Ver Produtos
+                            </a>
+                            <a href="index.html" class="btn btn-outline">
+                                <i class="fas fa-home"></i> Voltar à Página Inicial
+                            </a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const subtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
+            const shipping = 5.00;
+            const tax = subtotal * 0.23;
+            const total = subtotal + shipping;
+            
+            document.getElementById('cart-content').innerHTML = `
+                <div class="cart-container">
+                    <div class="cart-grid">
+                        <!-- Lista de produtos -->
+                        <div class="cart-items">
+                            <div class="cart-header">
+                                <h2>Produtos no Carrinho (${cart.length})</h2>
+                                <button onclick="clearCart()" class="btn btn-small btn-danger">
+                                    <i class="fas fa-trash"></i> Limpar Carrinho
+                                </button>
+                            </div>
+                            
+                            ${cart.map(item => `
+                            <div class="cart-item" data-id="${item.product.id}">
+                                <div class="item-image">
+                                    <img src="images/${item.product.imagem || 'default.jpg'}" 
+                                         alt="${item.product.nome}"
+                                         onerror="this.src='images/default.jpg'">
+                                </div>
+                                
+                                <div class="item-details">
+                                    <h3><a href="produto-detalhe.html?id=${item.product.id}">${item.product.nome}</a></h3>
+                                    <p class="item-category">${item.product.categoria}</p>
+                                    <p class="item-sku">Ref: PROD-${item.product.id.toString().padStart(3, '0')}</p>
+                                    
+                                    <div class="item-availability">
+                                        ${item.product.stock > 0 ? 
+                                            `<span class="in-stock"><i class="fas fa-check"></i> Em stock</span>` : 
+                                            `<span class="out-of-stock"><i class="fas fa-times"></i> Esgotado</span>`
+                                        }
+                                        <span class="item-stock">${item.product.stock} unidades disponíveis</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="item-quantity">
+                                    <div class="quantity-controls">
+                                        <button onclick="updateQuantity(${item.product.id}, -1)" class="qty-btn" ${item.quantity <= 1 ? 'disabled' : ''}>
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" 
+                                               value="${item.quantity}" 
+                                               min="1" 
+                                               max="${item.product.stock}"
+                                               class="quantity-input"
+                                               onchange="updateQuantityInput(${item.product.id}, this.value)">
+                                        <button onclick="updateQuantity(${item.product.id}, 1)" class="qty-btn" ${item.quantity >= item.product.stock ? 'disabled' : ''}>
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <button onclick="removeFromCart(${item.product.id})" class="btn-remove">
+                                        <i class="fas fa-trash"></i> Remover
+                                    </button>
+                                </div>
+                                
+                                <div class="item-price">
+                                    <p class="unit-price">€${item.product.preco.toFixed(2)}</p>
+                                    <p class="subtotal">Subtotal: €${item.subtotal.toFixed(2)}</p>
+                                </div>
+                            </div>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- Resumo do carrinho -->
+                        <div class="cart-summary">
+                            <h2><i class="fas fa-receipt"></i> Resumo da Compra</h2>
+                            
+                            <div class="summary-details">
+                                <div class="summary-row">
+                                    <span>Subtotal (${cart.reduce((sum, item) => sum + item.quantity, 0)} itens):</span>
+                                    <span>€${subtotal.toFixed(2)}</span>
+                                </div>
+                                
+                                <div class="summary-row">
+                                    <span>Portes:</span>
+                                    <span>€${shipping.toFixed(2)}</span>
+                                </div>
+                                
+                                <div class="summary-row">
+                                    <span>IVA (23%):</span>
+                                    <span>€${tax.toFixed(2)}</span>
+                                </div>
+                                
+                                <div class="summary-row total">
+                                    <span>Total:</span>
+                                    <span class="grand-total">€${total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="discount-code">
+                                <h3><i class="fas fa-tag"></i> Código de Desconto</h3>
+                                <div class="discount-input">
+                                    <input type="text" id="discount-code" placeholder="Introduza o código">
+                                    <button onclick="applyDiscount()" class="btn btn-small">Aplicar</button>
+                                </div>
+                                <p class="discount-info">Códigos disponíveis: DESCONTO10 (10% off), FREESHIP (portes grátis)</p>
+                            </div>
+                            
+                            <div class="checkout-actions">
+                                <a href="checkout.html" class="btn btn-success btn-large btn-full">
+                                    <i class="fas fa-lock"></i> Finalizar Compra
+                                </a>
+                                
+                                <div class="secure-checkout">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Pagamento 100% seguro</span>
+                                </div>
+                                
+                                <div class="payment-methods">
+                                    <img src="https://cdn-icons-png.flaticon.com/128/196/196578.png" alt="MB Way" title="MB Way">
+                                    <img src="https://cdn-icons-png.flaticon.com/128/196/196565.png" alt="Multibanco" title="Multibanco">
+                                    <img src="https://cdn-icons-png.flaticon.com/128/196/196561.png" alt="Visa" title="Visa">
+                                    <img src="https://cdn-icons-png.flaticon.com/128/196/196560.png" alt="Mastercard" title="Mastercard">
+                                </div>
+                            </div>
+                            
+                            <div class="cart-benefits">
+                                <h3><i class="fas fa-gift"></i> Benefícios</h3>
+                                <ul>
+                                    <li><i class="fas fa-shipping-fast"></i> Entrega grátis em compras acima de €50</li>
+                                    <li><i class="fas fa-undo"></i> Devolução gratuita em 30 dias</li>
+                                    <li><i class="fas fa-headset"></i> Suporte 24/7</li>
+                                    <li><i class="fas fa-shield-alt"></i> Compra 100% segura</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ações adicionais -->
+                    <div class="cart-footer">
+                        <div class="continue-shopping">
+                            <a href="produtos.html" class="btn btn-outline">
+                                <i class="fas fa-arrow-left"></i> Continuar a Comprar
+                            </a>
+                        </div>
+                        
+                        <div class="save-cart">
+                            <button onclick="saveCart()" class="btn btn-outline">
+                                <i class="fas fa-save"></i> Guardar Carrinho
+                            </button>
+                            <p class="save-note">O seu carrinho é guardado automaticamente</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function loadSuggestions() {
+            const cart = app.getCart();
+            if (cart.length === 0) {
+                document.getElementById('suggestions-grid').style.display = 'none';
+                return;
+            }
+            
+            // Obter categorias dos produtos no carrinho
+            const cartCategories = [...new Set(cart.map(item => item.product.categoria))];
+            
+            // Obter produtos da mesma categoria (excluindo os já no carrinho)
+            const allProducts = app.getProducts();
+            const cartProductIds = cart.map(item => item.product.id);
+            
+            const suggestions = allProducts
+                .filter(product => 
+                    cartCategories.includes(product.categoria) && 
+                    !cartProductIds.includes(product.id)
+                )
+                .slice(0, 4); // Mostrar apenas 4 sugestões
+            
+            if (suggestions.length === 0) {
+                document.getElementById('suggestions-grid').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('suggestions-grid').innerHTML = suggestions.map(product => `
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="images/${product.imagem || 'default.jpg'}" 
+                             alt="${product.nome}"
+                             onerror="this.src='images/default.jpg'">
+                    </div>
+                    <h3>${product.nome}</h3>
+                    <p class="product-category">${product.categoria}</p>
+                    <p class="price">€${product.preco.toFixed(2)}</p>
+                    <div class="product-actions">
+                        <a href="produto-detalhe.html?id=${product.id}" class="btn btn-small">
+                            Ver Detalhes
+                        </a>
+                        <button onclick="addToCart(${product.id})" class="btn btn-small btn-cart">
+                            <i class="fas fa-cart-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateQuantity(productId, change) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const index = cart.findIndex(item => item.productId === productId);
+            
+            if (index !== -1) {
+                const product = app.getProducts().find(p => p.id === productId);
+                
+                if (!product) return;
+                
+                const newQuantity = cart[index].quantity + change;
+                
+                if (newQuantity < 1) {
+                    removeFromCart(productId);
+                    return;
+                }
+                
+                if (newQuantity > product.stock) {
+                    showMessage(`Só temos ${product.stock} unidades disponíveis deste produto`, 'warning');
+                    return;
+                }
+                
+                cart[index].quantity = newQuantity;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                // Recarregar carrinho
+                loadCart();
+                showMessage('Quantidade atualizada', 'success');
+            }
+        }
+        
+        function updateQuantityInput(productId, newQuantity) {
+            const quantity = parseInt(newQuantity);
+            if (isNaN(quantity) || quantity < 1) return;
+            
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const index = cart.findIndex(item => item.productId === productId);
+            
+            if (index !== -1) {
+                const product = app.getProducts().find(p => p.id === productId);
+                
+                if (!product) return;
+                
+                if (quantity > product.stock) {
+                    showMessage(`Só temos ${product.stock} unidades disponíveis deste produto`, 'warning');
+                    return;
+                }
+                
+                cart[index].quantity = quantity;
+                localStorage.setItem('cart', JSON.stringify(cart));
+                loadCart();
+            }
+        }
+        
+        function removeFromCart(productId) {
+            if (confirm('Remover este produto do carrinho?')) {
+                app.removeFromCart(productId);
+                loadCart();
+                loadSuggestions();
+                showMessage('Produto removido do carrinho', 'success');
+            }
+        }
+        
+        function clearCart() {
+            if (confirm('Tem certeza que deseja limpar todo o carrinho?')) {
+                localStorage.setItem('cart', JSON.stringify([]));
+                loadCart();
+                loadSuggestions();
+                showMessage('Carrinho limpo', 'success');
+            }
+        }
+        
+        function saveCart() {
+            const user = app.getCurrentUser();
+            if (!user) {
+                showMessage('Faça login para guardar o carrinho', 'warning');
+                return;
+            }
+            
+            // Em uma aplicação real, aqui enviaríamos para o servidor
+            showMessage('Carrinho guardado com sucesso!', 'success');
+        }
+        
+        function addToCart(productId) {
+            if (app.addToCart(productId, 1)) {
+                showMessage('Produto adicionado ao carrinho!', 'success');
+                loadCart();
+                loadSuggestions();
+            }
+        }
+        
+        function applyDiscount() {
+            const code = document.getElementById('discount-code').value.toUpperCase();
+            const validCodes = {
+                'DESCONTO10': 0.10, // 10% de desconto
+                'FREESHIP': 'free'  // Portes grátis
+            };
+            
+            if (validCodes[code]) {
+                showMessage(`Código "${code}" aplicado com sucesso!`, 'success');
+            } else {
+                showMessage('Código inválido ou expirado', 'error');
+            }
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('cart-message');
+            messageDiv.textContent = text;
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+    
+    <style>
+        .cart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .cart-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .cart-item {
+            display: grid;
+            grid-template-columns: 120px 2fr 200px 150px;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-image img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .item-details h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+        
+        .item-details h3 a {
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .item-details h3 a:hover {
+            color: #4CAF50;
+        }
+        
+        .item-category {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .item-sku {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+        
+        .item-availability {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .in-stock {
+            color: #4CAF50;
+            font-weight: 500;
+        }
+        
+        .out-of-stock {
+            color: #f44336;
+            font-weight: 500;
+        }
+        
+        .item-stock {
+            color: #666;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .qty-btn {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        
+        .qty-btn:hover:not(:disabled) {
+            background: #f5f5f5;
+            border-color: #4CAF50;
+        }
+        
+        .qty-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .btn-remove {
+            background: none;
+            border: none;
+            color: #f44336;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-remove:hover {
+            text-decoration: underline;
+        }
+        
+        .item-price {
+            text-align: right;
+        }
+        
+        .unit-price {
+            font-weight: 500;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .subtotal {
+            font-weight: 700;
+            color: #4CAF50;
+            font-size: 1.1rem;
+        }
+        
+        .discount-code {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .discount-input {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .discount-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .discount-info {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .checkout-actions {
+            margin: 30px 0;
+        }
+        
+        .secure-checkout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #666;
+            margin: 15px 0;
+        }
+        
+        .secure-checkout i {
+            color: #4CAF50;
+        }
+        
+        .payment-methods {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .payment-methods img {
+            height: 30px;
+            opacity: 0.7;
+        }
+        
+        .cart-benefits {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .cart-benefits ul {
+            list-style: none;
+            margin: 15px 0;
+        }
+        
+        .cart-benefits li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+        
+        .cart-benefits li i {
+            color: #4CAF50;
+        }
+        
+        .cart-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        
+        .save-note {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .login-prompt, .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .login-prompt i, .empty-cart i {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        
+        .auth-buttons, .cart-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .suggestions {
+            margin-top: 60px;
+        }
+        
+        @media (max-width: 992px) {
+            .cart-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cart-item {
+                grid-template-columns: 100px 1fr;
+                gap: 15px;
+            }
+            
+            .item-quantity, .item-price {
+                grid-column: span 2;
+                text-align: left;
+            }
+            
+            .item-price {
+                text-align: right;
+            }
+            
+            .cart-footer {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .cart-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .auth-buttons, .cart-actions {
+                flex-direction: column;
+            }
+            
+            .discount-input {
+                flex-direction: column;
+            }
+        }
+    </style>
+</body>
+</html>

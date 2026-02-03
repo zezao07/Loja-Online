@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JTR Digital Solutions | Loja Online</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html"><i class="fas fa-store"></i> JTR Digital Solutions</a>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <!-- Menu será carregado via JavaScript -->
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- Banner -->
+        <section class="banner">
+            <h1>Bem-vindo à JTR Digital Solutions</h1>
+            <p>Os melhores produtos com os melhores preços. Qualidade garantida!</p>
+            <a href="produtos.html" class="btn btn-large">
+                <i class="fas fa-shopping-bag"></i> Explorar Produtos
+            </a>
+        </section>
+
+        <!-- Produtos em destaque -->
+        <section class="featured-products">
+            <h2><i class="fas fa-fire"></i> Produtos em Destaque</h2>
+            <div class="products-grid" id="featured-products">
+                <!-- Produto 1: Mochila -->
+                <div class="product-card fade-in" data-category="acessorios">
+                    <div class="product-image">
+                        <img src="images/produtos/backpack.jpg" 
+                             alt="Mochila Premium" 
+                             loading="lazy"
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    </div>
+                    <div class="product-category">Acessórios</div>
+                    <h3>Mochila Premium</h3>
+                    <p class="product-description">Mochila resistente à água com compartimento para laptop 15.6" e múltiplos bolsos organizadores.</p>
+                    <div class="price">€ 49,99 <span class="price-original">€ 59,99</span></div>
+                    <div class="stock"><i class="fas fa-check-circle"></i> Em stock: 12 unidades</div>
+                    <div class="product-actions">
+                        <a href="produto-detalhe.html?id=1" class="btn btn-outline">Ver Detalhes</a>
+                        <button class="btn btn-cart" onclick="adicionarAoCarrinho(1)">
+                            <i class="fas fa-cart-plus"></i> Carrinho
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Produto 2: Livro -->
+                <div class="product-card fade-in" data-category="livros">
+                    <div class="product-image">
+                        <img src="images/produtos/book.jpg" 
+                             alt="Livro: A Arte da Programação" 
+                             loading="lazy"
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    </div>
+                    <div class="product-category">Livros</div>
+                    <h3>Livro: A Arte da Programação</h3>
+                    <p class="product-description">Guia completo para desenvolvedores, 500 páginas, edição atualizada 2024 com exemplos práticos.</p>
+                    <div class="price">€ 24,99 <span class="price-original">€ 29,99</span></div>
+                    <div class="stock"><i class="fas fa-check-circle"></i> Em stock: 25 unidades</div>
+                    <div class="product-actions">
+                        <a href="produto-detalhe.html?id=2" class="btn btn-outline">Ver Detalhes</a>
+                        <button class="btn btn-cart" onclick="adicionarAoCarrinho(2)">
+                            <i class="fas fa-cart-plus"></i> Carrinho
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Produto 3: Fones -->
+                <div class="product-card fade-in" data-category="eletronicos">
+                    <div class="product-image">
+                        <img src="images/produtos/headphones.jpg" 
+                             alt="Fones Bluetooth Premium" 
+                             loading="lazy"
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    </div>
+                    <div class="product-category">Eletrônicos</div>
+                    <h3>Fones Bluetooth Premium</h3>
+                    <p class="product-description">Cancelamento de ruído ativo, 30h bateria, microfone integrado, som surround 360°.</p>
+                    <div class="price">€ 89,99 <span class="price-original">€ 119,99</span></div>
+                    <div class="stock"><i class="fas fa-check-circle"></i> Em stock: 8 unidades</div>
+                    <div class="product-actions">
+                        <a href="produto-detalhe.html?id=3" class="btn btn-outline">Ver Detalhes</a>
+                        <button class="btn btn-cart" onclick="adicionarAoCarrinho(3)">
+                            <i class="fas fa-cart-plus"></i> Carrinho
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Produto 4: Telemóvel -->
+                <div class="product-card fade-in" data-category="eletronicos">
+                    <div class="product-image">
+                        <img src="images/produtos/phone.jpg" 
+                             alt="Smartphone Android Pro" 
+                             loading="lazy"
+                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1598327105666-5b89351aff97?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    </div>
+                    <div class="product-category">Eletrônicos</div>
+                    <h3>Smartphone Android Pro</h3>
+                    <p class="product-description">Tela 6.5" AMOLED, 128GB, câmera 64MP, processador octa-core, 5G.</p>
+                    <div class="price">€ 399,99 <span class="price-original">€ 499,99</span></div>
+                    <div class="stock warning"><i class="fas fa-exclamation-triangle"></i> Últimas 3 unidades</div>
+                    <div class="product-actions">
+                        <a href="produto-detalhe.html?id=4" class="btn btn-outline">Ver Detalhes</a>
+                        <button class="btn btn-cart" onclick="adicionarAoCarrinho(4)">
+                            <i class="fas fa-cart-plus"></i> Carrinho
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-40">
+                <a href="produtos.html" class="btn btn-large">
+                    <i class="fas fa-eye"></i> Ver Todos os Produtos
+                </a>
+            </div>
+        </section>
+
+        <!-- Estatísticas -->
+        <section class="visits-counter">
+            <div class="counter-box">
+                <i class="fas fa-eye"></i>
+                <h3>Visitas</h3>
+                <p class="count" id="visit-count">1,248</p>
+                <p>a esta página</p>
+            </div>
+            
+            <div class="counter-box">
+                <i class="fas fa-users"></i>
+                <h3>Clientes Satisfeitos</h3>
+                <p class="count" id="user-count">856</p>
+                <p>em toda a Portugal</p>
+            </div>
+            
+            <div class="counter-box">
+                <i class="fas fa-box"></i>
+                <h3>Produtos</h3>
+                <p class="count" id="product-count">50+</p>
+                <p>disponíveis</p>
+            </div>
+            
+            <div class="counter-box">
+                <i class="fas fa-truck"></i>
+                <h3>Entregas</h3>
+                <p class="count" id="delivery-count">2,147</p>
+                <p>realizadas</p>
+            </div>
+        </section>
+
+        <!-- Sobre nós -->
+        <section class="about">
+            <h2><i class="fas fa-info-circle"></i> Sobre a JTR Digital Solutions</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>A <strong>JTR Digital Solutions</strong> é uma loja online portuguesa comprometida em oferecer os melhores produtos tecnológicos e acessórios com qualidade garantida e os melhores preços do mercado.</p>
+                    
+                    <p>Fundada em 2023, a nossa missão é proporcionar uma experiência de compra online simples, segura e satisfatória. Trabalhamos apenas com fornecedores certificados e testamos todos os produtos antes de disponibilizá-los na nossa loja.</p>
+                    
+                    <h3><i class="fas fa-award"></i> Porquê escolher-nos?</h3>
+                    <ul>
+                        <li><i class="fas fa-shipping-fast"></i> <strong>Entrega Rápida:</strong> Enviamos em 24-48h para todo o país</li>
+                        <li><i class="fas fa-shield-alt"></i> <strong>Garantia:</strong> 2 anos em todos os produtos eletrónicos</li>
+                        <li><i class="fas fa-headset"></i> <strong>Suporte:</strong> Atendimento ao cliente 24/7</li>
+                        <li><i class="fas fa-lock"></i> <strong>Segurança:</strong> Pagamentos 100% seguros com encriptação SSL</li>
+                        <li><i class="fas fa-undo"></i> <strong>Devoluções:</strong> 30 dias para devoluções sem complicações</li>
+                        <li><i class="fas fa-tags"></i> <strong>Preços:</strong> Os melhores preços com garantia de igualação</li>
+                    </ul>
+                    
+                    <div class="mt-40">
+                        <a href="empregos.html" class="btn btn-outline">
+                            <i class="fas fa-briefcase"></i> Ver Oportunidades de Emprego
+                        </a>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="about-image-container">
+                        <i class="fas fa-laptop-code fa-8x" style="color: #4CAF50;"></i>
+                        <div class="about-image-text">
+                            <h3>+850 Clientes Satisfeitos</h3>
+                            <p>⭐️⭐️⭐️⭐️⭐️ 4.8/5 Avaliação</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testemunhos -->
+        <section class="about mt-40">
+            <h2><i class="fas fa-comments"></i> O que os nossos clientes dizem</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        <i class="fas fa-quote-left"></i>
+                        <p>Comprei o smartphone e fiquei impressionado com a velocidade de entrega e a qualidade do produto. Recomendo!</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <strong>Miguel Santos</strong>
+                        <p>Lisboa</p>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        <i class="fas fa-quote-left"></i>
+                        <p>Excelente serviço ao cliente! Tive um problema com a minha encomenda e foi resolvido em menos de 24 horas.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <strong>Ana Rodrigues</strong>
+                        <p>Porto</p>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        <i class="fas fa-quote-left"></i>
+                        <p>Os preços são realmente competitivos e a qualidade dos produtos é excelente. Já recomendei a vários amigos!</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <strong>Carlos Oliveira</strong>
+                        <p>Braga</p>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>JTR Digital Solutions</h3>
+                <p><i class="fas fa-store"></i> Loja online líder em produtos digitais</p>
+                <p><i class="fas fa-map-marker-alt"></i> Av. da Liberdade, 123, Lisboa</p>
+                <p><i class="fas fa-phone"></i> +351 210 123 456</p>
+                <p><i class="fas fa-envelope"></i> geral@jtrdigital.pt</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Categorias</h3>
+                <p><a href="produtos.html?cat=eletronicos"><i class="fas fa-mobile-alt"></i> Eletrônicos</a></p>
+                <p><a href="produtos.html?cat=acessorios"><i class="fas fa-laptop"></i> Acessórios</a></p>
+                <p><a href="produtos.html?cat=livros"><i class="fas fa-book"></i> Livros</a></p>
+                <p><a href="produtos.html?cat=vestuario"><i class="fas fa-tshirt"></i> Vestuário</a></p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Ajuda</h3>
+                <p><a href="#"><i class="fas fa-question-circle"></i> FAQs</a></p>
+                <p><a href="#"><i class="fas fa-shipping-fast"></i> Envios & Entregas</a></p>
+                <p><a href="#"><i class="fas fa-undo"></i> Devoluções</a></p>
+                <p><a href="#"><i class="fas fa-shield-alt"></i> Política de Privacidade</a></p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Siga-nos</h3>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook"></i> Facebook</a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i> Instagram</a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i> Twitter</a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </div>
+                <div class="newsletter mt-20">
+                    <h4>Newsletter</h4>
+                    <p>Receba as nossas ofertas especiais</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Seu email" required>
+                        <button type="submit" class="btn btn-small">Subscrever</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 JTR Digital Solutions. Todos os direitos reservados. | NIF: 123 456 789</p>
+            <p>
+                <a href="#">Termos de Serviço</a> | 
+                <a href="#">Política de Privacidade</a> | 
+                <a href="#">Política de Cookies</a>
+            </p>
+            <p class="payment-methods">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-paypal"></i>
+                <i class="fab fa-cc-apple-pay"></i>
+                <i class="fab fa-cc-amazon-pay"></i>
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Função para adicionar ao carrinho
+        function adicionarAoCarrinho(produtoId) {
+            if (typeof window.adicionarAoCarrinho === 'function') {
+                window.adicionarAoCarrinho(produtoId, 1);
+            } else {
+                // Fallback se a função não estiver disponível
+                alert('Produto adicionado ao carrinho!');
+                console.log(`Produto ${produtoId} adicionado ao carrinho`);
+            }
+        }
+
+        // Atualizar contadores quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animar contadores
+            function animarContador(elemento, valorFinal, duracao = 2000) {
+                let valorInicial = 0;
+                const incremento = valorFinal / (duracao / 16); // 60fps
+                const contador = elemento;
+                
+                function atualizar() {
+                    valorInicial += incremento;
+                    if (valorInicial < valorFinal) {
+                        contador.textContent = Math.floor(valorInicial);
+                        requestAnimationFrame(atualizar);
+                    } else {
+                        contador.textContent = valorFinal;
+                    }
+                }
+                
+                atualizar();
+            }
+
+            // Iniciar animação dos contadores quando visíveis
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const contador = entry.target;
+                        const valorFinal = parseInt(contador.textContent.replace('+', '').replace(',', ''));
+                        
+                        if (!contador.classList.contains('animated')) {
+                            contador.classList.add('animated');
+                            animarContador(contador, valorFinal);
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            // Observar todos os contadores
+            document.querySelectorAll('.count').forEach(contador => {
+                observer.observe(contador);
+            });
+
+            // Inicializar funcionalidades de imagens
+            if (typeof window.adicionarLoadingImagens === 'function') {
+                window.adicionarLoadingImagens();
+            }
+
+            // Precarregar imagens
+            if (typeof window.precarregarImagensProdutos === 'function') {
+                window.precarregarImagensProdutos();
+            }
+        });
+    </script>
+</body>
+</html>
